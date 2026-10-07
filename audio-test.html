@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buana Academy | Tes Suara & Musik Studio</title>
+  <meta name="description" content="Uji coba bunyi lonceng, gema shalat, lagu Indonesia Raya, dan suara robot untuk Buana Academy.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Design Tokens -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-full flex flex-col p-4 md:p-8 max-w-5xl mx-auto space-y-8">
+
+  <!-- ==================== Header ==================== -->
+  <header class="glass-panel p-4 md:px-8 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 text-white font-bold font-display text-lg">
+        🔊
+      </div>
+      <div>
+        <h1 class="font-display font-bold text-lg md:text-xl text-white tracking-tight">Tes Suara & Lonceng Studio</h1>
+        <p class="text-xs text-slate-400">Coba semua bunyi lonceng, suara robot pengingat, dan musik lagu kebangsaan</p>
+      </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex items-center gap-2">
+      <a href="index.html" class="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/80 flex items-center gap-2 transition-all">
+        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+        Layar TV Kelas
+      </a>
+      <a href="admin.html" class="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/80 flex items-center gap-2 transition-all">
+        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        Atur Jadwal (Admin)
+      </a>
+    </nav>
+  </header>
+
+  <!-- ==================== Audio Health & Live Visualizer ==================== -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Web Audio Health Card -->
+    <div class="glass-panel p-6 rounded-3xl space-y-4 border border-slate-800">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-slate-300 font-mono uppercase">Status Suara Studio</h2>
+        <span id="badge-ctx-state" class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30">
+          Belum Aktif
+        </span>
+      </div>
+
+      <div class="space-y-2 text-xs font-mono text-slate-400">
+        <div class="flex justify-between py-1 border-b border-slate-800">
+          <span>Kesiapan:</span>
+          <span id="txt-engine-status" class="text-slate-200">Sentuh tombol untuk memulai</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-800">
+          <span>Kualitas Bunyi:</span>
+          <span id="txt-sample-rate" class="text-slate-200">HD 48000 Hz</span>
+        </div>
+        <div class="flex justify-between py-1 border-b border-slate-800">
+          <span>Gema Lonceng:</span>
+          <span class="text-emerald-400">Gema Alami Halus</span>
+        </div>
+        <div class="flex justify-between py-1">
+          <span>Pembuat Nada:</span>
+          <span class="text-cyan-400">Sintesis Web Mandiri</span>
+        </div>
+      </div>
+
+      <button id="btn-unlock-audio" class="w-full py-2.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-xs shadow-lg shadow-cyan-500/25 transition-all flex items-center justify-center gap-2">
+        <span>▶️ Nyalakan Suara & Lonceng</span>
+      </button>
+    </div>
+
+    <!-- Live Real-Time Spectrum Visualizer -->
+    <div class="md:col-span-2 glass-panel p-6 rounded-3xl space-y-3 border border-slate-800 flex flex-col justify-between">
+      <div class="flex items-center justify-between">
+        <h2 class="text-sm font-bold text-slate-300 font-mono uppercase">Gelombang Suara Musik 🌊</h2>
+        <span class="text-xs text-cyan-400 font-mono">Grafik Warna-Warni Bergerak Sesuai Nada</span>
+      </div>
+
+      <!-- Canvas -->
+      <div class="w-full h-32 bg-slate-950/80 rounded-2xl border border-slate-800/80 overflow-hidden relative">
+        <canvas id="visualizer-canvas" class="w-full h-full"></canvas>
+      </div>
+
+      <!-- Master Volume Control -->
+      <div class="flex items-center gap-4 pt-1">
+        <span class="text-xs font-mono text-slate-400 uppercase">Volume Suara Utama:</span>
+        <input type="range" id="master-volume-slider" min="0" max="1" step="0.01" value="0.85" class="flex-1 accent-cyan-400 bg-slate-800 h-2 rounded-lg cursor-pointer">
+        <span id="txt-volume-val" class="text-xs font-mono font-bold text-cyan-400 w-12 text-right">85%</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Sound Preset Triggers ==================== -->
+  <section class="space-y-4">
+    <div class="flex items-center justify-between">
+      <h2 class="text-xl font-bold font-display text-white">Pilihan Bunyi Lonceng Studio 🔔</h2>
+      <span class="text-xs text-slate-400">Bunyi jernih instan langsung dari peramban web</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <!-- Preset 1: Tibetan Singing Bowl -->
+      <div class="glass-panel p-6 rounded-3xl space-y-3 border-l-4 border-accent-stem hover:border-cyan-400 transition-all">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="text-xs font-mono text-cyan-400 font-semibold uppercase">Lonceng Pengingat T-10 Menit ⏳</div>
+            <h3 class="text-lg font-bold text-white">Mangkuk Suara Tibet 🧘 (Dengung Rileks)</h3>
+          </div>
+          <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">Nada Dengung Halus</span>
+        </div>
+        <p class="text-xs text-slate-400">
+          Suara dengung mangkuk meditasi yang menenangkan untuk mengingatkan anak-anak bersiap-siap membereskan peralatan kelas.
+        </p>
+        <button id="btn-play-bowl" class="w-full py-3 rounded-2xl bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-cyan-400 font-bold text-sm border border-cyan-500/30 flex items-center justify-center gap-2 transition-all shadow-md">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Dengarkan Mangkuk Suara Tibet
+        </button>
+      </div>
+
+      <!-- Preset 2: Deep Bronze Double Gong -->
+      <div class="glass-panel p-6 rounded-3xl space-y-3 border-l-4 border-accent-martial hover:border-rose-400 transition-all">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="text-xs font-mono text-rose-400 font-semibold uppercase">Lonceng Selesai Kelas (T-0) 🏁</div>
+            <h3 class="text-lg font-bold text-white">Gong Perunggu 🔔 (Dentuman Mantap)</h3>
+          </div>
+          <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-rose-500/10 text-rose-400 border border-rose-500/20">Gema Dua Dentuman</span>
+        </div>
+        <p class="text-xs text-slate-400">
+          Dua dentuman gong perunggu bernada dalam yang tegas sebagai tanda waktu sesi pelajaran telah selesai.
+        </p>
+        <button id="btn-play-gong" class="w-full py-3 rounded-2xl bg-slate-800 hover:bg-rose-500 hover:text-slate-950 text-rose-400 font-bold text-sm border border-rose-500/30 flex items-center justify-center gap-2 transition-all shadow-md">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Dengarkan Gong Perunggu
+        </button>
+      </div>
+
+      <!-- Preset 3: Soft Two-Tone Chime -->
+      <div class="glass-panel p-6 rounded-3xl space-y-3 border-l-4 border-accent-sunnah hover:border-emerald-400 transition-all">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="text-xs font-mono text-emerald-400 font-semibold uppercase">Lonceng Pembuka Ceria 🚀</div>
+            <h3 class="text-lg font-bold text-white">Lonceng Dua Nada 🎵 (Ting-Tung)</h3>
+          </div>
+          <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Ting-Tung Modern</span>
+        </div>
+        <p class="text-xs text-slate-400">
+          Dua nada lonceng ceria dan ramah untuk menyambut murid saat kelas baru dimulai atau pengumuman istirahat.
+        </p>
+        <button id="btn-play-twotone" class="w-full py-3 rounded-2xl bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-emerald-400 font-bold text-sm border border-emerald-500/30 flex items-center justify-center gap-2 transition-all shadow-md">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Dengarkan Lonceng Ting-Tung
+        </button>
+      </div>
+
+      <!-- Preset 4: Zen Temple Bell (Keisu) -->
+      <div class="glass-panel p-6 rounded-3xl space-y-3 border-l-4 border-accent-language hover:border-purple-400 transition-all">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="text-xs font-mono text-purple-400 font-semibold uppercase">Lonceng Fokus & Tenang ✨</div>
+            <h3 class="text-lg font-bold text-white">Lonceng Zen Jernih ✨</h3>
+          </div>
+          <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-purple-500/10 text-purple-400 border border-purple-500/20">Suara Berkilau Jernih</span>
+        </div>
+        <p class="text-xs text-slate-400">
+          Dentang lonceng tembaga yang jernih dan panjang untuk mengajak anak-anak fokus dan tertib.
+        </p>
+        <button id="btn-play-zen" class="w-full py-3 rounded-2xl bg-slate-800 hover:bg-purple-500 hover:text-slate-950 text-purple-400 font-bold text-sm border border-purple-500/30 flex items-center justify-center gap-2 transition-all shadow-md">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Dengarkan Lonceng Zen
+        </button>
+      </div>
+
+      <!-- Preset 5: Adzan Call Resonance -->
+      <div class="glass-panel p-6 rounded-3xl space-y-3 border-l-4 border-emerald-500 hover:border-emerald-400 transition-all">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="text-xs font-mono text-emerald-400 font-semibold uppercase">Panggilan Waktu Shalat 🕌</div>
+            <h3 class="text-lg font-bold text-white">Gema Adzan Ibadah 🕌</h3>
+          </div>
+          <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Gema Tenang & Syahdu</span>
+        </div>
+        <p class="text-xs text-slate-400">
+          Bunyi nada syahdu untuk mengingatkan anak-anak mengambil wudhu dan merapikan barisan shalat berjamaah.
+        </p>
+        <button id="btn-play-adzan" class="w-full py-3 rounded-2xl bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 text-emerald-400 font-bold text-sm border border-emerald-500/30 flex items-center justify-center gap-2 transition-all shadow-md">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Dengarkan Gema Adzan
+        </button>
+      </div>
+
+      <!-- Preset 6: Indonesia Raya Choral / Acapella Synth (🇮🇩) -->
+      <div class="glass-panel p-6 rounded-3xl space-y-3 border-l-4 border-rose-500 hover:border-rose-400 transition-all">
+        <div class="flex items-start justify-between">
+          <div>
+            <div class="text-xs font-mono text-rose-400 font-semibold uppercase">Rutinitas Pagi 09:00 / 10:00 🇮🇩</div>
+            <h3 class="text-lg font-bold text-white">Lagu Kebangsaan Indonesia Raya 🇮🇩</h3>
+          </div>
+          <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-rose-500/10 text-rose-400 border border-rose-500/20">Paduan Suara Web Mandiri</span>
+        </div>
+        <p class="text-xs text-slate-400">
+          Lagu kebangsaan Indonesia Raya dengan terompet pembuka, vokal paduan suara harmonis, dan dentang gong penutup.
+        </p>
+        <button id="btn-play-anthem" class="w-full py-3 rounded-2xl bg-slate-800 hover:bg-rose-500 hover:text-slate-950 text-rose-400 font-bold text-sm border border-rose-500/30 flex items-center justify-center gap-2 transition-all shadow-md">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          Dengarkan Lagu Indonesia Raya
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== Multilingual Voice Sandbox ==================== -->
+  <section class="glass-panel p-6 md:p-8 rounded-3xl space-y-6 border border-slate-800">
+    <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center text-white text-lg shadow-lg shadow-purple-500/20">
+          🗣️
+        </div>
+        <div>
+          <h2 class="text-xl font-bold font-display text-white">Uji Coba Suara Robot Pengingat 🗣️</h2>
+          <p class="text-xs text-slate-400">Dengarkan lafal suara dalam Basa Sunda, Bahasa Indonesia, Bahasa Inggris, dan Bahasa Arab</p>
+        </div>
+      </div>
+      <span id="voice-detected-count" class="px-2.5 py-1 rounded-full text-xs font-mono bg-purple-500/15 text-purple-300 border border-purple-500/30">
+        Memeriksa Suara Robot...
+      </span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Pilih Bahasa 🌐</label>
+        <select id="test-voice-lang" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+          <option value="sundanese">Basa Sunda 🌺</option>
+          <option value="indonesian">Bahasa Indonesia 🇮🇩</option>
+          <option value="english">English (Inggris 🇬🇧)</option>
+          <option value="arabic">Bahasa Arab (العربية 🇸🇦)</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Pengisi Suara 🗣️</label>
+        <select id="test-voice-gender" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+          <option value="alternate">Bergantian (Laki-laki ⇄ Perempuan)</option>
+          <option value="female">Suara Perempuan (Ceria)</option>
+          <option value="male">Suara Laki-laki (Tenang)</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Contoh Pengumuman 🎯</label>
+        <select id="test-voice-type" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+          <option value="opening">🚀 Mulai Kelas (Semangat)</option>
+          <option value="warning">⏳ Pengingat Beres-Beres (T-10m)</option>
+          <option value="end">🏁 Kelas Selesai (Penutupan)</option>
+          <option value="anthem">🇮🇩 Ajakan Berdiri Lagu Indonesia Raya</option>
+          <option value="adzan">🕌 Waktu Adzan Shalat</option>
+          <option value="preparePrayer">🕌 Persiapan Wudhu & Shalat</option>
+          <option value="dzikirPagi">📖 Pengingat Dzikir Pagi</option>
+          <option value="dhuha">☀️ Pengingat Shalat Dhuha</option>
+          <option value="dzikirPetang">📿 Pengingat Dzikir Petang</option>
+          <option value="makan">🍱 Waktu Istirahat Makan</option>
+          <option value="qoilullah">🛌 Istirahat Siang Qoilullah</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Custom Speech Text Area -->
+    <div class="space-y-2">
+      <div class="flex items-center justify-between">
+        <label class="block text-xs font-semibold text-slate-300 uppercase font-mono">Tulis Kalimat Bebas untuk Dibacakan (Opsional)</label>
+        <span class="text-[11px] text-slate-400">Bisa tulis kalimat sendiri untuk diucapkan robot</span>
+      </div>
+      <textarea id="test-voice-custom-text" rows="2" placeholder="Contoh: Sampurasun wargi Buana Academy! Hayu urang kawitan sési proyék ieu kalayan pinuh sumanget!" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-cyan-500 font-sans"></textarea>
+    </div>
+
+    <!-- Test Actions Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
+      <button id="btn-speak-test" class="py-3 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs shadow-lg shadow-purple-600/25 flex items-center justify-center gap-2 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        🗣️ Suara Saja
+      </button>
+
+      <button id="btn-test-chime-and-voice" class="py-3 px-4 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs shadow-lg shadow-cyan-600/25 flex items-center justify-center gap-2 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"></path></svg>
+        🔔 Lonceng + Suara
+      </button>
+
+      <button id="btn-test-anthem-flow" class="py-3 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-bold text-xs shadow-lg shadow-rose-600/25 flex items-center justify-center gap-1.5 transition-all">
+        <span>🇮🇩</span> Tes Lagu Lengkap
+      </button>
+
+      <button id="btn-test-adzan-flow" class="py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all">
+        <span>🕌</span> Tes Alur Adzan
+      </button>
+
+      <button id="btn-cancel-voice" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs border border-slate-700 flex items-center justify-center gap-2 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12"></rect></svg>
+        ⏹️ Stop Suara
+      </button>
+    </div>
+  </section>
+
+  <!-- ==================== Optional Custom Audio & YouTube Stream Tester ==================== -->
+  <section class="glass-panel p-6 rounded-3xl space-y-4 border border-slate-800">
+    <div>
+      <h2 class="text-lg font-bold font-display text-white">Putar Audio dari Link YouTube atau MP3 📺</h2>
+      <p class="text-xs text-slate-400">Putar audio langsung dari link YouTube (contoh: <code class="text-rose-400 font-mono">https://www.youtube.com/watch?v=...</code> atau <code class="text-rose-400 font-mono">https://youtu.be/...</code>) atau file MP3/WAV.</p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center gap-3">
+      <input type="text" id="custom-audio-url" placeholder="https://www.youtube.com/watch?v=... atau https://youtu.be/... atau https://example.com/audio.mp3" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white font-mono focus:outline-none focus:border-cyan-500">
+      <button id="btn-play-custom-url" class="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-sm font-bold shadow-lg shadow-cyan-500/20 whitespace-nowrap transition-all">
+        ▶️ Putar Link
+      </button>
+    </div>
+  </section>
+
+  <!-- Audio Test Script (ES Module) -->
+  <script type="module">
+    import { AudioEngine } from './js/audio-engine.js';
+    import { VoiceEngine } from './js/voice-engine.js';
+    import { Storage } from './js/storage.js';
+
+    // Elements
+    const elBadgeState = document.getElementById('badge-ctx-state');
+    const elTxtStatus = document.getElementById('txt-engine-status');
+    const elTxtSampleRate = document.getElementById('txt-sample-rate');
+    const elBtnUnlock = document.getElementById('btn-unlock-audio');
+    const elVolumeSlider = document.getElementById('master-volume-slider');
+    const elTxtVolume = document.getElementById('txt-volume-val');
+    const elCanvas = document.getElementById('visualizer-canvas');
+
+    // Preset buttons
+    const elBtnBowl = document.getElementById('btn-play-bowl');
+    const elBtnGong = document.getElementById('btn-play-gong');
+    const elBtnTwoTone = document.getElementById('btn-play-twotone');
+    const elBtnZen = document.getElementById('btn-play-zen');
+    const elBtnAdzan = document.getElementById('btn-play-adzan');
+    const elBtnAnthem = document.getElementById('btn-play-anthem');
+    const elInCustomUrl = document.getElementById('custom-audio-url');
+    const elBtnCustomUrl = document.getElementById('btn-play-custom-url');
+
+    // Voice Sandbox Elements
+    const elVoiceDetectedCount = document.getElementById('voice-detected-count');
+    const elTestVoiceLang = document.getElementById('test-voice-lang');
+    const elTestVoiceGender = document.getElementById('test-voice-gender');
+    const elTestVoiceType = document.getElementById('test-voice-type');
+    const elTestVoiceCustomText = document.getElementById('test-voice-custom-text');
+    const elBtnSpeakTest = document.getElementById('btn-speak-test');
+    const elBtnChimeAndVoice = document.getElementById('btn-test-chime-and-voice');
+    const elBtnAnthemFlow = document.getElementById('btn-test-anthem-flow');
+    const elBtnCancelVoice = document.getElementById('btn-cancel-voice');
+
+    function updateHealthUI(state) {
+      if (state === 'running') {
+        elBadgeState.className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+        elBadgeState.textContent = 'Suara Menyala';
+        elTxtStatus.textContent = 'Siap Berbunyi';
+        if (AudioEngine.ctx) {
+          elTxtSampleRate.textContent = `HD ${AudioEngine.ctx.sampleRate} Hz`;
+        }
+      } else {
+        elBadgeState.className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-400 border border-amber-500/30';
+        elBadgeState.textContent = 'Belum Aktif';
+        elTxtStatus.textContent = 'Sentuh tombol untuk memulai';
+      }
+    }
+
+    AudioEngine.onStateChange(updateHealthUI);
+
+    // Track detected OS voices
+    VoiceEngine.onVoicesReady((voices) => {
+      if (elVoiceDetectedCount) {
+        elVoiceDetectedCount.textContent = `✅ ${voices.length} Suara Robot Siap`;
+        elVoiceDetectedCount.className = 'px-2.5 py-1 rounded-full text-xs font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+      }
+    });
+
+    elBtnUnlock.onclick = async () => {
+      VoiceEngine.unlock();
+      await AudioEngine.initAudioContext();
+      updateHealthUI(AudioEngine.getContextState());
+    };
+
+    // Load initial settings
+    const settings = Storage.getSettings();
+    if (settings.masterVolume !== undefined) {
+      elVolumeSlider.value = settings.masterVolume;
+      AudioEngine.setMasterVolume(settings.masterVolume);
+      elTxtVolume.textContent = `${Math.round(settings.masterVolume * 100)}%`;
+    }
+
+    // Volume Slider Handler
+    elVolumeSlider.oninput = (e) => {
+      const vol = parseFloat(e.target.value);
+      AudioEngine.setMasterVolume(vol);
+      elTxtVolume.textContent = `${Math.round(vol * 100)}%`;
+      Storage.saveSettings({ ...Storage.getSettings(), masterVolume: vol });
+    };
+
+    // Preset Triggers
+    if (elBtnBowl) elBtnBowl.onclick = () => AudioEngine.playSingingBowl();
+    if (elBtnGong) elBtnGong.onclick = () => AudioEngine.playDoubleGong();
+    if (elBtnTwoTone) elBtnTwoTone.onclick = () => AudioEngine.playSoftTwoTone();
+    if (elBtnZen) elBtnZen.onclick = () => AudioEngine.playZenBell();
+    if (elBtnAdzan) elBtnAdzan.onclick = () => AudioEngine.playAdzanCall();
+    if (elBtnAnthem) elBtnAnthem.onclick = () => AudioEngine.playIndonesiaRaya({ volume: AudioEngine.getMasterVolume() });
+
+    // Voice Sandbox Handlers
+    if (elBtnSpeakTest) {
+      elBtnSpeakTest.onclick = async () => {
+        VoiceEngine.unlock();
+        const customText = elTestVoiceCustomText ? elTestVoiceCustomText.value.trim() : '';
+        const lang = elTestVoiceLang ? elTestVoiceLang.value : 'sundanese';
+        const gender = elTestVoiceGender ? elTestVoiceGender.value : 'alternate';
+        const type = elTestVoiceType ? elTestVoiceType.value : 'warning';
+
+        if (customText) {
+          await VoiceEngine.testSpeech({ langId: lang, gender, sampleText: customText });
+        } else if (type === 'anthem') {
+          await VoiceEngine.speakAnthemAnnouncement({
+            time: '10:00',
+            settings: {
+              voiceEnabled: true,
+              voiceLanguage: lang,
+              voiceGender: gender,
+              voiceRate: 0.95,
+              masterVolume: AudioEngine.getMasterVolume()
+            }
+          });
+        } else {
+          let actionText = 'Simpen wadah proyék sareng tata matras';
+          if (lang === 'indonesian') actionText = 'simpan kembali boks proyek dan rapikan matras latihan';
+          if (lang === 'arabic') actionText = 'ترتيب الأدوات وتجهيز البساط';
+          if (lang === 'english') actionText = 'Store project bins and prepare mats';
+          
+          await VoiceEngine.speakAnnouncement({
+            type,
+            slotTitle: 'Robotika & Coding Seru',
+            actionInstruction: actionText,
+            nextSlotTitle: 'Praktek Robotika Terpadu',
+            nextSlotTime: '15:30',
+            warningMinutes: 10,
+            settings: {
+              voiceEnabled: true,
+              voiceLanguage: lang,
+              voiceGender: gender,
+              voiceRate: 0.95,
+              masterVolume: AudioEngine.getMasterVolume()
+            }
+          });
+        }
+      };
+    }
+
+    // Full Flow: Chime + Voice sequence test
+    if (elBtnChimeAndVoice) {
+      elBtnChimeAndVoice.onclick = async () => {
+        VoiceEngine.unlock();
+        await AudioEngine.playSingingBowl();
+        setTimeout(async () => {
+          const lang = elTestVoiceLang ? elTestVoiceLang.value : 'sundanese';
+          const gender = elTestVoiceGender ? elTestVoiceGender.value : 'alternate';
+          await VoiceEngine.speakAnnouncement({
+            type: 'warning',
+            slotTitle: 'Robotika & Coding Seru',
+            actionInstruction: 'Simpen wadah proyék sareng tata matras kanggo latihan salajengna',
+            nextSlotTitle: 'Praktek Robotika Terpadu',
+            nextSlotTime: '15:30',
+            warningMinutes: 10,
+            settings: {
+              voiceEnabled: true,
+              voiceLanguage: lang,
+              voiceGender: gender,
+              voiceRate: 0.95,
+              masterVolume: AudioEngine.getMasterVolume()
+            }
+          });
+        }, 1400);
+      };
+    }
+
+    // Full Flow: Indonesia Raya Standing Announcement + Anthem Synth
+    if (elBtnAnthemFlow) {
+      elBtnAnthemFlow.onclick = async () => {
+        VoiceEngine.unlock();
+        AudioEngine.unlock();
+        await AudioEngine.playZenBell();
+        setTimeout(async () => {
+          const lang = elTestVoiceLang ? elTestVoiceLang.value : 'indonesian';
+          const gender = elTestVoiceGender ? elTestVoiceGender.value : 'alternate';
+          await VoiceEngine.speakAnthemAnnouncement({
+            time: '10:00',
+            settings: {
+              voiceEnabled: true,
+              voiceLanguage: lang,
+              voiceGender: gender,
+              voiceRate: 0.95,
+              masterVolume: AudioEngine.getMasterVolume()
+            }
+          });
+          setTimeout(async () => {
+            await AudioEngine.playIndonesiaRaya({ volume: AudioEngine.getMasterVolume() });
+          }, 1200);
+        }, 1000);
+      };
+    }
+
+    // Full Flow: Adzan Call & Prayer Announcement
+    const elBtnAdzanFlow = document.getElementById('btn-test-adzan-flow');
+    if (elBtnAdzanFlow) {
+      elBtnAdzanFlow.onclick = async () => {
+        VoiceEngine.unlock();
+        await AudioEngine.playAdzanCall();
+        setTimeout(async () => {
+          const lang = elTestVoiceLang ? elTestVoiceLang.value : 'sundanese';
+          const gender = elTestVoiceGender ? elTestVoiceGender.value : 'alternate';
+          await VoiceEngine.speakPrayerAnnouncement({
+            type: 'adzan',
+            prayerName: 'Ashar',
+            settings: {
+              voiceEnabled: true,
+              voiceLanguage: lang,
+              voiceGender: gender,
+              voiceRate: 0.95,
+              masterVolume: AudioEngine.getMasterVolume()
+            }
+          });
+        }, 3500);
+      };
+    }
+
+    if (elBtnCancelVoice) {
+      elBtnCancelVoice.onclick = () => {
+        AudioEngine.stopAll();
+      };
+    }
+
+    if (elBtnCustomUrl && elInCustomUrl) {
+      elBtnCustomUrl.onclick = async () => {
+        const url = elInCustomUrl.value.trim();
+        if (!url) {
+          alert('Silakan masukkan link YouTube atau file audio MP3.');
+          return;
+        }
+        try {
+          await AudioEngine.playCustomUrl(url);
+        } catch (err) {
+          alert('Tidak dapat memutar audio: ' + err.message);
+        }
+      };
+    }
+
+    // Canvas Visualizer Loop
+    function startVisualizer() {
+      if (!elCanvas) return;
+      const ctx = elCanvas.getContext('2d');
+      const dpr = window.devicePixelRatio || 1;
+      
+      const resize = () => {
+        elCanvas.width = elCanvas.clientWidth * dpr;
+        elCanvas.height = elCanvas.clientHeight * dpr;
+      };
+      resize();
+      window.addEventListener('resize', resize);
+
+      const bufferLength = 128;
+      const dataArray = new Uint8Array(bufferLength);
+
+      function draw() {
+        requestAnimationFrame(draw);
+        const analyser = AudioEngine.getAnalyser();
+
+        ctx.fillStyle = '#090d16';
+        ctx.fillRect(0, 0, elCanvas.width, elCanvas.height);
+
+        if (!analyser) {
+          // Draw idle flatline
+          ctx.lineWidth = 2 * dpr;
+          ctx.strokeStyle = 'rgba(6, 182, 212, 0.2)';
+          ctx.beginPath();
+          ctx.moveTo(0, elCanvas.height / 2);
+          ctx.lineTo(elCanvas.width, elCanvas.height / 2);
+          ctx.stroke();
+          return;
+        }
+
+        analyser.getByteFrequencyData(dataArray);
+
+        const barWidth = (elCanvas.width / bufferLength) * 2.5;
+        let barHeight;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+          barHeight = (dataArray[i] / 255) * elCanvas.height * 0.9;
+
+          // Gradient color: Cyan -> Indigo -> Rose
+          const hue = 180 + (i / bufferLength) * 120;
+          ctx.fillStyle = `hsla(${hue}, 90%, 60%, 0.85)`;
+
+          ctx.fillRect(x, elCanvas.height - barHeight, barWidth - 1, barHeight);
+          x += barWidth + 1;
+        }
+      }
+
+      draw();
+    }
+
+    startVisualizer();
+  </script>
+</body>
+</html>

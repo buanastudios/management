@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buana Academy | Schedule Administrator</title>
+  <meta name="description" content="Administrative Schedule & Transition Manager for Buana Academy Studio.">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Design Tokens -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-full flex flex-col p-4 md:p-8 max-w-7xl mx-auto space-y-8">
+
+  <!-- ==================== Navigation Bar ==================== -->
+  <header class="glass-panel p-4 md:px-8 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20 text-white font-bold font-display text-xl">
+        ⭐
+      </div>
+      <div>
+        <h1 class="font-display font-extrabold text-lg md:text-xl text-white tracking-tight">Buana Academy Manager</h1>
+        <p class="text-xs text-slate-300">Atur Jadwal Kelas, Suara Pengingat & Lonceng Studio</p>
+      </div>
+    </div>
+
+    <!-- Navigation Links -->
+    <nav class="flex items-center gap-2">
+      <a href="index.html" class="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700/80 flex items-center gap-2 transition-all">
+        <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+        <span>📺 Layar Kelas</span>
+      </a>
+      <a href="audio-test.html" class="px-4 py-2 rounded-xl text-xs md:text-sm font-semibold bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white border border-slate-700/80 flex items-center gap-2 transition-all">
+        <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path></svg>
+        <span>🔊 Tes Suara</span>
+      </a>
+      <button id="btn-add-slot" class="px-4 py-2 rounded-xl text-xs md:text-sm font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/25 flex items-center gap-2 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+        <span>+ Tambah Jadwal</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- ==================== Day Selector Tabs ==================== -->
+  <section class="space-y-4">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <h2 id="active-day-title" class="text-2xl font-bold font-display text-white">Senin</h2>
+        <span id="slot-count-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+          4 Sesi
+        </span>
+      </div>
+      <div class="text-xs text-slate-400 font-mono hidden md:block">
+        ✨ Otomatis tersinkron langsung ke layar kelas
+      </div>
+    </div>
+
+    <!-- Day Buttons Bar -->
+    <div id="day-tabs-container" class="glass-panel p-2 rounded-2xl flex items-center gap-1.5 overflow-x-auto">
+      <!-- Generated via js/admin.js -->
+    </div>
+  </section>
+
+  <!-- ==================== Schedule Items List ==================== -->
+  <main class="space-y-4 flex-1">
+    <div id="schedule-list" class="space-y-3">
+      <!-- Rendered via js/admin.js -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-schedule-state" class="hidden glass-panel p-12 rounded-3xl text-center space-y-4 border border-slate-800">
+      <div class="w-16 h-16 mx-auto rounded-2xl bg-slate-800 flex items-center justify-center text-slate-400 text-3xl">
+        📅
+      </div>
+      <div>
+        <h3 class="text-lg font-bold text-white">Belum ada jadwal untuk hari ini</h3>
+        <p class="text-sm text-slate-400">Klik tombol "+ Tambah Jadwal" di atas untuk menambahkan sesi kelas.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== Voice Synthesis & Multilingual Persona Management ==================== -->
+  <section class="glass-panel p-6 md:p-8 rounded-3xl space-y-6 border border-slate-800">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center text-white text-lg shadow-lg shadow-purple-500/20">
+          🗣️
+        </div>
+        <div>
+          <h2 class="text-xl font-bold font-display text-white">Suara Pengingat Otomatis (Voice Guide)</h2>
+          <p class="text-xs text-slate-400">Pilih bahasa dan jenis suara robot untuk mengingatkan siswa di ruang kelas</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="voice-enable-toggle" class="sr-only peer" checked>
+          <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500"></div>
+          <span class="ml-2 text-xs font-semibold text-slate-300">Suara Aktif</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- Language Selection -->
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-slate-300 uppercase font-mono">Pilihan Bahasa</label>
+        <select id="voice-lang-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
+          <option value="sundanese">Basa Sunda (🌺)</option>
+          <option value="indonesian">Bahasa Indonesia (🇮🇩)</option>
+          <option value="english">English / Bahasa Inggris (🇬🇧)</option>
+          <option value="arabic">Bahasa Arab (🇸🇦)</option>
+          <option value="multilingual_su_en">Dwibahasa: Sunda + Inggris</option>
+          <option value="multilingual_id_en">Dwibahasa: Indonesia + Inggris</option>
+          <option value="random_rotate">Ganti Otomatis (Sunda ➔ Indonesia ➔ Inggris ➔ Arab)</option>
+        </select>
+        <p class="text-[11px] text-slate-400">Bahasa yang digunakan robot saat berbicara memberi pengumuman.</p>
+      </div>
+
+      <!-- Voice Gender / Persona Selection -->
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-slate-300 uppercase font-mono">Karakter Suara</label>
+        <select id="voice-gender-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
+          <option value="alternate">Ganti-Ganti (Pria ⇄ Wanita)</option>
+          <option value="female">Suara Wanita (Ceria & Jelas)</option>
+          <option value="male">Suara Pria (Tenang & Mantap)</option>
+        </select>
+        <p class="text-[11px] text-slate-400">Mode ganti-ganti akan bergantian suara pria dan wanita setiap pengumuman.</p>
+      </div>
+
+      <!-- Speech Speed -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <label class="block text-xs font-semibold text-slate-300 uppercase font-mono">Kecepatan Suara</label>
+          <span id="voice-rate-label" class="text-xs font-mono font-bold text-cyan-400">0.95x</span>
+        </div>
+        <input type="range" id="voice-rate-slider" min="0.7" max="1.3" step="0.05" value="0.95" class="w-full accent-cyan-400 bg-slate-800 h-2 rounded-lg cursor-pointer">
+        <div class="flex justify-between text-[10px] text-slate-500 font-mono">
+          <span>0.7x Lambat</span>
+          <span>1.0x Sedang</span>
+          <span>1.3x Cepat</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Checkboxes & Quick Test Buttons -->
+    <div class="pt-4 border-t border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-6 text-xs text-slate-300">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="voice-announce-warning-check" class="rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-0" checked>
+          <span>🔔 Bunyikan Peringatan 10 Menit Beres-Beres</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="voice-announce-end-check" class="rounded bg-slate-900 border-slate-700 text-cyan-500 focus:ring-0" checked>
+          <span>🏁 Bunyikan Saat Sesi Selesai</span>
+        </label>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btn-test-sundanese" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 flex items-center gap-1.5 transition-all">
+          <span>🗣️ Coba B. Sunda</span>
+        </button>
+        <button id="btn-test-english" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-indigo-400 border border-slate-700 flex items-center gap-1.5 transition-all">
+          <span>🗣️ Coba English</span>
+        </button>
+        <button id="btn-test-arabic" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 flex items-center gap-1.5 transition-all">
+          <span>🗣️ Coba B. Arab</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Voice Presets & Multilingual Studio ==================== -->
+  <section class="glass-panel p-6 md:p-8 rounded-3xl space-y-6 border border-cyan-500/20">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-indigo-600 flex items-center justify-center text-white text-lg shadow-lg shadow-cyan-500/20">
+          🎙️
+        </div>
+        <div>
+          <h2 class="text-xl font-bold font-display text-white">Preset Kalimat Suara (Voice Presets)</h2>
+          <p class="text-xs text-slate-400">Tulis dan simpan kalimat yang akan dibacakan robot untuk pembuka, shalat, dzikir, makan, dan beres-beres</p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+        <div class="relative flex-1 md:w-64">
+          <input type="text" id="in-preset-search" placeholder="Cari kalimat atau nama preset..." class="w-full bg-slate-900/90 border border-slate-700/80 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-cyan-500">
+          <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+
+        <button id="btn-add-preset" type="button" class="px-4 py-2 rounded-xl text-xs md:text-sm font-bold bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white shadow-lg shadow-cyan-500/20 flex items-center gap-2 transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+          <span>+ Buat Kalimat Baru</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Dual Filter Rows: Activity Labels + Languages -->
+    <div class="space-y-2">
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-mono text-cyan-400 uppercase font-bold w-16 shrink-0">Aktivitas:</span>
+        <div id="preset-label-filters" class="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <!-- Generated via js/admin.js -->
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-[10px] font-mono text-indigo-400 uppercase font-bold w-16 shrink-0">Bahasa:</span>
+        <div id="preset-lang-filters" class="flex items-center gap-1.5 overflow-x-auto pb-1">
+          <!-- Generated via js/admin.js -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Voice Presets List Grid -->
+    <div id="voice-presets-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- Populated via js/admin.js -->
+    </div>
+  </section>
+
+  <!-- ==================== Islamic Schedule, 5-Time Prayer Times & Dzikir Management ==================== -->
+  <section class="glass-panel p-6 md:p-8 rounded-3xl space-y-6 border border-emerald-500/20">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-lg shadow-lg shadow-emerald-500/20">
+          🕌
+        </div>
+        <div>
+          <h2 class="text-xl font-bold font-display text-white">Waktu Shalat & Dzikir Harian</h2>
+          <p class="text-xs text-slate-400">Atur jam shalat 5 waktu, Dzikir Pagi, Shalat Dhuha, dan Dzikir Petang</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+          ✅ Pengingat Ibadah Aktif
+        </span>
+      </div>
+    </div>
+
+    <!-- Prayer Times 8-Grid Inputs -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3 text-xs">
+      <div class="space-y-1">
+        <label class="block text-slate-300 font-bold flex items-center gap-1">
+          <span>🌅</span> Subuh
+        </label>
+        <input type="time" id="prayer-time-subuh" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white font-mono focus:border-emerald-500">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-slate-300 font-bold flex items-center gap-1">
+          <span>📖</span> Dzikir Pagi
+        </label>
+        <input type="time" id="prayer-time-dzikirPagi" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white font-mono focus:border-emerald-500">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-slate-300 font-bold flex items-center gap-1">
+          <span>☀️</span> Dhuha
+        </label>
+        <input type="time" id="prayer-time-dhuha" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white font-mono focus:border-emerald-500">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-slate-300 font-bold flex items-center gap-1">
+          <span>☀️</span> Dzuhur
+        </label>
+        <input type="time" id="prayer-time-dzuhur" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white font-mono focus:border-emerald-500">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-slate-300 font-bold flex items-center gap-1">
+          <span>🌤️</span> Ashar
+        </label>
+        <input type="time" id="prayer-time-ashar" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white font-mono focus:border-emerald-500">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-slate-300 font-bold flex items-center gap-1">
+          <span>📿</span> Dzikir Petang
+        </label>
+        <input type="time" id="prayer-time-dzikirPetang" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white font-mono focus:border-emerald-500">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-slate-300 font-bold flex items-center gap-1">
+          <span>🌇</span> Maghrib
+        </label>
+        <input type="time" id="prayer-time-maghrib" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white font-mono focus:border-emerald-500">
+      </div>
+
+      <div class="space-y-1">
+        <label class="block text-slate-300 font-bold flex items-center gap-1">
+          <span>🌙</span> Isya
+        </label>
+        <input type="time" id="prayer-time-isya" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-white font-mono focus:border-emerald-500">
+      </div>
+    </div>
+
+    <!-- Toggles & Quick Test Row -->
+    <div class="pt-4 border-t border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="flex flex-wrap items-center gap-5 text-xs text-slate-300">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="prayer-adzan-toggle" class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0" checked>
+          <span>📢 Panggilan Suara Adzan</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="prayer-prepare-toggle" class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0" checked>
+          <span>💧 Pengingat Wudhu (10 Menit Sebelum)</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="prayer-dzikir-toggle" class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0" checked>
+          <span>📖 Pengingat Dzikir Pagi & Petang</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="prayer-dhuha-toggle" class="rounded bg-slate-900 border-slate-700 text-emerald-500 focus:ring-0" checked>
+          <span>☀️ Pengingat Shalat Dhuha</span>
+        </label>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btn-test-adzan" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5 transition-all">
+          <span>📢 Tes Suara Adzan</span>
+        </button>
+        <button id="btn-test-dzikir-pagi" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-slate-700 flex items-center gap-1.5 transition-all">
+          <span>📖 Tes Dzikir Pagi</span>
+        </button>
+        <button id="btn-test-dhuha" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-amber-400 border border-slate-700 flex items-center gap-1.5 transition-all">
+          <span>☀️ Tes Dhuha</span>
+        </button>
+        <button id="btn-test-dzikir-petang" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-purple-400 border border-slate-700 flex items-center gap-1.5 transition-all">
+          <span>📿 Tes Dzikir Petang</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 🇮🇩 Lagu Kebangsaan Indonesia Raya ==================== -->
+  <section class="glass-panel p-6 md:p-8 rounded-3xl space-y-6 border border-rose-500/25">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-600 to-red-500 flex items-center justify-center text-white text-lg shadow-lg shadow-rose-500/20">
+          🇮🇩
+        </div>
+        <div>
+          <h2 class="text-xl font-bold font-display text-white">Lagu Kebangsaan Indonesia Raya</h2>
+          <p class="text-xs text-slate-400">Pengingat berdiri tegak & pemutaran lagu kebangsaan setiap jam 09:00 atau 10:00 pagi</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <label class="relative inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="indonesia-raya-enabled" class="sr-only peer" checked>
+          <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-rose-500"></div>
+          <span class="ml-2 text-xs font-semibold text-slate-300">Rutinitas Aktif</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Config Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+      <!-- Anthem Time Picker -->
+      <div class="space-y-1.5">
+        <label class="block font-semibold text-slate-300 font-mono uppercase">Jam Pemutaran</label>
+        <div class="flex items-center gap-2">
+          <input type="time" id="indonesia-raya-time" value="10:00" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono focus:border-rose-500">
+        </div>
+        <div class="flex gap-1.5 pt-1">
+          <button type="button" class="btn-quick-anthem-time px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700" data-time="09:00">09:00 Pagi</button>
+          <button type="button" class="btn-quick-anthem-time px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700" data-time="10:00">10:00 Pagi (Standar)</button>
+        </div>
+      </div>
+
+      <!-- Spoken Standing Call Preset -->
+      <div class="space-y-1.5">
+        <label class="block font-semibold text-slate-300 font-mono uppercase">Kalimat Ajakan Berdiri</label>
+        <select id="indonesia-raya-voice-preset" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-rose-500">
+          <!-- Populated via admin.js -->
+        </select>
+        <label class="flex items-center gap-1.5 pt-1 cursor-pointer text-slate-300 text-[11px]">
+          <input type="checkbox" id="indonesia-raya-announce-enabled" class="rounded bg-slate-900 border-slate-700 text-rose-500 focus:ring-0" checked>
+          <span>Ucapkan ajakan berdiri sebelum lagu dimulai</span>
+        </label>
+      </div>
+
+      <!-- Audio Mode -->
+      <div class="space-y-1.5">
+        <label class="block font-semibold text-slate-300 font-mono uppercase">Sumber Suara Lagu</label>
+        <select id="indonesia-raya-audio-mode" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:border-rose-500">
+          <option value="synth_acapella">Musik Suara Web Otomatis 🇮🇩</option>
+          <option value="custom_url">Link YouTube / File Audio MP3 📺</option>
+        </select>
+        <p class="text-[10px] text-slate-400 font-mono">Bisa pakai musik bawaan web atau link YouTube/MP3</p>
+      </div>
+
+      <!-- Custom Audio URL -->
+      <div class="space-y-1.5">
+        <label class="block font-semibold text-slate-300 font-mono uppercase">Link YouTube atau Link MP3</label>
+        <input type="text" id="indonesia-raya-custom-url" placeholder="https://www.youtube.com/watch?v=... atau https://youtu.be/..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:border-rose-500 font-mono">
+        <p class="text-[10px] text-emerald-400 font-mono">✅ Mendukung link YouTube (youtu.be / watch?v=...), MP3 & WAV</p>
+      </div>
+    </div>
+
+    <!-- Quick Action & Diagnostics Buttons -->
+    <div class="pt-3 border-t border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <div class="text-xs text-slate-400">
+        Layar kelas akan menampilkan spanduk berdiri tegak secara otomatis pada jam yang ditentukan.
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btn-test-anthem-voice" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 flex items-center gap-1.5 transition-all">
+          <span>🗣️ Coba Suara Berdiri</span>
+        </button>
+        <button id="btn-test-anthem-audio" type="button" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-rose-300 border border-slate-700 flex items-center gap-1.5 transition-all">
+          <span>🇮🇩 Coba Musik Lagu</span>
+        </button>
+        <button id="btn-test-anthem-full" type="button" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white shadow-lg shadow-rose-500/20 flex items-center gap-1.5 transition-all">
+          <span>▶️ Coba Alur Lengkap</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== Footer Utilities (Backup & Reset) ==================== -->
+  <footer class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4 border border-slate-800">
+    <div class="text-xs text-slate-400 space-y-0.5">
+      <div class="font-bold text-slate-300">💾 Penyimpanan Aman Otomatis</div>
+      <div>Semua perubahan jadwal tersimpan langsung dan otomatis tampil di layar kelas.</div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <input type="file" id="import-file-input" accept=".json" class="hidden">
+      <button id="btn-import-json" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+        <span>📤 Buka Cadangan (Import JSON)</span>
+      </button>
+      <button id="btn-export-json" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700 flex items-center gap-1.5 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+        <span>📥 Unduh Cadangan (Export JSON)</span>
+      </button>
+      <button id="btn-reset-factory" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 border border-rose-500/30 flex items-center gap-1.5 transition-all">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+        <span>🔄 Reset ke Awal</span>
+      </button>
+    </div>
+  </footer>
+
+  <!-- ==================== Add / Edit Slot Modal ==================== -->
+  <div id="slot-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 overflow-y-auto">
+    <div class="glass-modal max-w-xl w-full p-6 md:p-8 rounded-3xl space-y-6 my-8 border border-slate-700 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <h3 id="modal-title" class="text-xl font-bold font-display text-white">Tambah / Ubah Jadwal Kelas 📅</h3>
+        <button id="btn-close-modal" type="button" class="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <form id="slot-form" class="space-y-4">
+        <input type="hidden" id="form-slot-id">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Hari 📅</label>
+            <select id="form-day" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" required>
+              <option value="Monday">Senin (Monday)</option>
+              <option value="Tuesday">Selasa (Tuesday)</option>
+              <option value="Wednesday">Rabu (Wednesday)</option>
+              <option value="Thursday">Kamis (Thursday)</option>
+              <option value="Friday">Jumat (Friday)</option>
+              <option value="Saturday">Sabtu (Saturday)</option>
+              <option value="Sunday">Minggu (Sunday)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Jam Mulai ⏰</label>
+            <input type="time" id="form-start-time" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 font-mono" required>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Jam Selesai ⏰</label>
+            <input type="time" id="form-end-time" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 font-mono" required>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Nama Kegiatan / Kelas 🏷️</label>
+            <input type="text" id="form-title" placeholder="Contoh: Robotika & Coding Seru" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" required>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Kategori Kelas 🎨</label>
+            <select id="form-category" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Guru / Coach 👤</label>
+            <input type="text" id="form-instructor" placeholder="Contoh: Kak Faris" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Ruangan / Tempat 📍</label>
+            <input type="text" id="form-location" placeholder="Contoh: Ruang Robotika (Studio A)" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Lonceng Pengingat ⏳</label>
+            <div class="flex items-center gap-2">
+              <input type="number" id="form-warning-threshold" min="1" max="60" value="10" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500 font-mono" required>
+              <span class="text-xs text-slate-400 font-bold shrink-0">menit sisa</span>
+            </div>
+          </div>
+
+          <div class="md:col-span-2">
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-semibold text-slate-300 uppercase font-mono">Suara Lonceng T-10m 🔔</label>
+              <button type="button" id="btn-preview-chime" class="text-xs text-cyan-400 hover:underline flex items-center gap-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"></path></svg>
+                Dengar Suara
+              </button>
+            </div>
+            <select id="form-audio-preset" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Suara Lonceng Kelas Selesai 🏁</label>
+          <select id="form-end-audio-preset" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+            <!-- Populated by JS -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Suara Pembuka (Awal) 🚀</label>
+            <select id="form-opening-voice-preset" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Suara Beres-Beres (T-10m) ⏳</label>
+            <select id="form-voice-preset" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Suara Penutup (Selesai) 🏁</label>
+            <select id="form-end-voice-preset" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+              <!-- Populated by JS -->
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Instruksi Beres-Beres di Layar TV 📋</label>
+          <input type="text" id="form-transition-instruction" placeholder="Contoh: Waktunya Rapikan Boks Robot • Bersihkan Meja • Gulung Matras" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+          <p class="text-[11px] text-slate-400 mt-1">Kalimat ini akan muncul besar di layar TV kelas saat 10 menit terakhir sesi.</p>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-800">
+          <button type="button" id="btn-cancel-modal" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-all">
+            Batal ❌
+          </button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl text-sm font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/25 transition-all">
+            💾 Simpan Jadwal
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== Voice Preset Editor Modal with Sundanese Dialect Guide ==================== -->
+  <div id="voice-preset-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 overflow-y-auto">
+    <div class="glass-modal max-w-3xl w-full p-6 md:p-8 rounded-3xl space-y-6 my-8 border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-cyan-300 text-base">
+            🎙️
+          </div>
+          <div>
+            <h3 id="preset-modal-title" class="text-xl font-bold font-display text-white">Edit Suara Robot / Preset 🎙️</h3>
+            <p class="text-xs text-slate-400">Tulis teks yang akan dibacakan robot dengan nada ceria dan semangat</p>
+          </div>
+        </div>
+        <button id="btn-close-preset-modal" type="button" class="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+
+      <!-- ==================== DYNAMIC MULTILINGUAL DIALECT & PHRASING GUIDE CONTAINER ==================== -->
+      <div id="modal-dialect-guide-container" class="bg-slate-900/90 rounded-2xl p-4 md:p-5 border border-cyan-500/30 space-y-4 shadow-inner">
+        <!-- Dynamically rendered via renderModalDialectGuide(langId) in js/admin.js -->
+      </div>
+
+      <!-- Preset Form -->
+      <form id="preset-form" class="space-y-4">
+        <input type="hidden" id="form-preset-id">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Nama Kalimat 🏷️</label>
+            <input type="text" id="form-preset-name" placeholder="Contoh: Sunda - Semangat Mulai Kelas" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500" required>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Untuk Kegiatan Apa? 🎯</label>
+            <select id="form-preset-label" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+              <option value="opening">Mulai Kelas (Opening) 🚀</option>
+              <option value="closing">Kelas Selesai (Closing) 🏁</option>
+              <option value="anthem">Lagu Indonesia Raya 🇮🇩</option>
+              <option value="sholat">Ajakan Shalat / Wudhu 🕌</option>
+              <option value="dzikir">Ajakan Dzikir 📿</option>
+              <option value="makan">Waktu Istirahat Makan 🍱</option>
+              <option value="qoilullah">Istirahat Qoilullah 🛌</option>
+              <option value="warning">Pengingat Beres-Beres (T-10m) ⏳</option>
+              <option value="custom">Pengumuman Bebas ✨</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Bahasa 🌐</label>
+            <select id="form-preset-lang" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+              <option value="sundanese">Basa Sunda 🌺</option>
+              <option value="indonesian">Bahasa Indonesia 🇮🇩</option>
+              <option value="english">English (Inggris 🇬🇧)</option>
+              <option value="arabic">Bahasa Arab (العربية 🇸🇦)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Pengisi Suara 🗣️</label>
+            <select id="form-preset-gender" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+              <option value="alternate">Bergantian (Laki-laki ⇄ Perempuan)</option>
+              <option value="female">Suara Perempuan (Ceria & Ramah)</option>
+              <option value="male">Suara Laki-laki (Tenang & Jelas)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono mb-1">Gaya Bicara ⚡</label>
+            <select id="form-preset-tone" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-500">
+              <option value="energetic">Semangat & Berenergi ⚡</option>
+              <option value="warm">Ramah & Hangat 🌟</option>
+              <option value="spiritual">Khusyuk & Tenang 🕊️</option>
+              <option value="authoritative">Tegas & Jelas 📢</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-semibold text-slate-300 uppercase font-mono">
+              Teks Kalimat yang Dibacakan Robot 💬
+            </label>
+            <span id="preset-char-count" class="text-[11px] font-mono text-slate-400">0 huruf</span>
+          </div>
+          <textarea id="form-preset-text" rows="4" placeholder="Tulis kalimat di sini. Bisa gunakan kode pintar seperti {title}, {minutes}, {action}, {nextTitle}..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white font-mono focus:outline-none focus:border-cyan-500 leading-relaxed" required></textarea>
+        </div>
+
+        <!-- Token Preview Box -->
+        <div class="bg-slate-950/60 p-3 rounded-xl border border-slate-800 space-y-1">
+          <div class="text-[11px] font-semibold text-slate-400 uppercase font-mono">🔍 Contoh Suara Saat Dibacakan:</div>
+          <div id="preset-live-preview" class="text-xs text-slate-300 italic">
+            -- Tulis kalimat di atas untuk melihat contoh pengucapannya --
+          </div>
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-800">
+          <button type="button" id="btn-test-modal-preset" class="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-bold bg-cyan-500/20 text-cyan-300 hover:bg-cyan-500/30 border border-cyan-500/40 flex items-center justify-center gap-2 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>🗣️ Dengar Contoh Suara</span>
+          </button>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <button type="button" id="btn-cancel-preset-modal" class="px-4 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white transition-all">
+              Batal ❌
+            </button>
+            <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-cyan-500 hover:bg-cyan-400 text-slate-950 shadow-lg shadow-cyan-500/25 transition-all">
+              💾 Simpan Kalimat
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Admin Controller Script -->
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
